@@ -1,0 +1,34 @@
+pipeline{
+    agent any
+    environment {
+    // Pulls username and password from Jenkins credentials
+    DOCKER_CREDS  = credentials('dockerhub-creds')
+  }
+
+    stages{
+        stage('Git Clone'){
+            steps{
+                sh 'git clone https://github.com/sagarjr11/Assignment-1.git'
+                echo 'Cloning Git repository...'
+            }
+        }
+        stage('build image using dockerfile'){
+            steps{
+                echo 'Building Docker image...'
+                sh 'docker build -t my-app .'
+                sh 'docker tag my-app:latest {dockerhubusername}/$JOB_NAME:V1.$BUILD_NUMBER'
+            }
+        }
+        stage('Push image to Docker Hub'){
+            steps{
+                echo 'Pushing image to Docker Hub...'
+                sh """
+                   echo ${DOCKER_CREDS_PSW} | docker login \
+                   -u ${DOCKER_CREDS_USR} \
+                   --password-stdin
+                   """               //echo mypassword | docker login -u sagar --password-stdin
+                sh 'docker push {dockerhubusername}/$JOB_NAME:V1.$BUILD_NUMBER'
+            }
+        }
+    }
+}
