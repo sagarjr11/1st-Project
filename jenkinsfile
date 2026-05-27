@@ -15,10 +15,9 @@ pipeline{
         stage('build image using dockerfile') {
             steps {
                 echo 'Building Docker image...'
-                dir('1st-Project') {
                 sh 'docker build -t my-app .'
                 sh 'docker tag my-app:latest {dockerhubusername}/$JOB_NAME:V1.$BUILD_NUMBER'
-             }
+             
              }
          }
         stage('Push image to Docker Hub') {
