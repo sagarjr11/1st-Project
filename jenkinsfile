@@ -34,8 +34,22 @@ pipeline{
          }
          stage('Deploy to Ec2 Machine ') {
             steps {
+                sshagent(credentials: ['ec2-ssh-key']) {
                 echo 'Deploying to Ec2 Machine...'
-                sh ''
+                sh """
+                    ssh -o StrictHostKeyChecking=no ${EC2_USER}@${EC2_HOST} '
+
+                        docker pull ${IMAGE_NAME}:latest
+
+                        docker stop myapp || true
+                        docker rm myapp || true
+
+                        docker run -d \
+                          --name myapp \
+                          -p 3000:3000 \
+                          ${IMAGE_NAME}:latest
+                    '
+                    """
              }
          }
      }
