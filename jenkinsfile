@@ -18,6 +18,7 @@ pipeline{
                 echo 'Building Docker image...'
                 sh 'docker build -t my-app .'
                 sh "docker tag my-app:latest ${IMAGE_NAME}:v1.${BUILD_NUMBER}"
+                sh "docker tag my-app:latest ${IMAGE_NAME}:latest"
              
              }
          }
@@ -30,6 +31,7 @@ pipeline{
                    --password-stdin
                    """               //echo mypassword | docker login -u sagar --password-stdin
                 sh 'docker push ${IMAGE_NAME}:v1.${BUILD_NUMBER}'
+                sh 'docker push ${IMAGE_NAME}:latest'
              }
          }
          stage('Deploy to Ec2 Machine ') {
