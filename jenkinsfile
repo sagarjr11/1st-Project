@@ -3,6 +3,7 @@ pipeline{
     environment {
     // Pulls username and password from Jenkins credentials
     DOCKER_CREDS  = credentials('dockerhub-creds')
+    IMAGE_NAME = "sagaromane/my-app"
      }
 
     stages{
@@ -16,7 +17,7 @@ pipeline{
             steps {
                 echo 'Building Docker image...'
                 sh 'docker build -t my-app .'
-                sh "docker tag my-app:latest ${DOCKER_CREDS_USR}/my_app:v1.${BUILD_NUMBER}"
+                sh "docker tag my-app:latest ${IMAGE_NAME}:v1.${BUILD_NUMBER}"
              
              }
          }
@@ -28,7 +29,7 @@ pipeline{
                    -u ${DOCKER_CREDS_USR} \
                    --password-stdin
                    """               //echo mypassword | docker login -u sagar --password-stdin
-                sh 'docker push $DOCKER_CREDS_USR/my_app:v1.$BUILD_NUMBER'
+                sh 'docker push ${IMAGE_NAME}:v1.${BUILD_NUMBER}'
              }
          }
          stage('Deploy to Ec2 Machine ') {
